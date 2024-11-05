@@ -15,3 +15,8 @@
 *.sx32fsl
 *.wx64fsl
 *.wx32fsl
+src.fasl
+.vscode/settings.json
+.vscode/alive/fasl/tmp.fasl
+.vscode/alive/repl-history.json
+.vscode/alive/fasl/tmp.lisp
