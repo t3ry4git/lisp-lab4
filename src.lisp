@@ -47,36 +47,26 @@
     
     (reduce (duplicate-elements-reducer 3 :duplicate-p #'evenp) '(1 2 3) :initial-value '())
     => (1 2 2 2 3)
-  
+
   Constraints:
-    - If initial-value is not provided and the input list is empty, an error will occur.
+    - An initial-value must be provided and must be a list.
     - The from-end parameter cannot be used with a value of T.
-    - If initial-value is not provided and the input list is not empty, everything will work correctly.
     - If the input list is empty but initial-value (even '()) is provided, NIL will be returned.
 
   "
-  ;; effective-duplicate-p => needed for :duplicate-p NIL case
   (let ((effective-duplicate-p (or duplicate-p (constantly t))))
     (lambda (acc item)
-      ;; `unless` block required only for usage without :initial-value 
-      ;; Example:
-      ;; (reduce (duplicate-elements-reducer 2) '(1 2 3))
-      ;; => (1 1 2 2 3 3)
-      (unless (listp acc)
-        (setf acc (if (funcall effective-duplicate-p acc)
-                      (make-list n :initial-element acc)
-                      (list acc))))
-      ;; Common logic
-      (append acc ;; Append accumulator with 
-        (if (funcall effective-duplicate-p item) ;; if duplicate-p 
-            (make-list n :initial-element item) ;; T or non-NIL -> create list[n] = {item, item, ..., item}
-            (list item))) ;; NIL          -> create list    = {item}
-      )))
+      (let ((items (if (funcall effective-duplicate-p item)
+                       (make-list n :initial-element item)
+                       (list item))))
+        (nconc acc items)))))
+
+
 
 (defun safe-reduce-duplicate-elements (n lst &key (duplicate-p nil))
   "A safe wrapper for REDUCE with duplicate-elements-reducer."
   (reduce (duplicate-elements-reducer n :duplicate-p duplicate-p) lst
-          :initial-value '() :from-end nil))
+          :initial-value nil :from-end nil))
 
 
 (defun run-recursive-sort-test (input expected-result test-description &key (key #'identity) (test #'<))
